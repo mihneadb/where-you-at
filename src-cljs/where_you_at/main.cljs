@@ -3,9 +3,9 @@
     (:require [dommy.core :as dom]))
 
 (def *connected* false)
-(def *peer* (js/Peer. (js-obj "key" "0uudvj3cp4fe0zfr"
-                            "id" "test1")))
-(def *connection* (.connect *peer* "test2"))
+(def *peer* nil)
+(def *connection* nil)
+
 
 (defn log [stuff]
   (.log js/console stuff))
@@ -15,6 +15,7 @@
           latitude (aget coords "latitude")
           longitude (aget coords "longitude")]
       (when *connected*
+        (log "sending")
         (.send *connection* (str latitude " " longitude)))))
 
 (defn process-recieved-data [data]
@@ -23,12 +24,9 @@
         longitude (read-string (data 1))]
     (log (str "Received" latitude " " longitude))))
 
-(.watchPosition js/navigator.geolocation send-location-data)
-
-
-
 
 (defn toggle-connected []
+  (log "toggled")
   (set! *connected* (not *connected*)))
 
 
@@ -38,8 +36,24 @@
           "center" (js/window.google.maps.LatLng. 25 25)))
 ;;
 (defn ^:export init []
+  (.watchPosition js/navigator.geolocation send-location-data)
   (window/google.maps.Map. (sel1 :#map) (map-config-obj)))
 
-(.on *connection* "open" toggle-connected)
 
 (set! (.-onload js/window) init)
+
+(defn main []
+  (let [own-id (dom/value (sel1 :#self))
+        other-id (dom/value (sel1 :#other))]
+    (set! *peer* (js/Peer. (js-obj "key" "0uudvj3cp4fe0zfr"
+                                   "id" own-id)))
+    (set! *connection* (.connect *peer* other-id))
+    (.on *connection* "open" toggle-connected)
+
+    (.on *peer* "connection" (fn [conn]
+                               (.on conn "data" process-received-data)))
+
+    (log "d")))
+
+(dom/listen! (sel1 :#start) :click main)
+
