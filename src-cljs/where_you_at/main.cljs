@@ -5,10 +5,6 @@
 (def *connected* false)
 (def *peer* nil)
 (def *connection* nil)
-
-(def *peer* (js/Peer. (js-obj "key" "0uudvj3cp4fe0zfr"
-                            "id" "test1")))
-(def *connection* (.connect *peer* "test2"))
 (def *mapInstance* nil)
 
 (defn log [stuff]
@@ -51,6 +47,7 @@
 
 
 (defn toggle-connected []
+  (log "toggle-connected")
   (set! *connected* (not *connected*)))
 
 
@@ -67,6 +64,7 @@
 (set! (.-onload js/window) init)
 
 (defn ^:export accept-connection [conn]
+  (log "accept-connection")
   (.on conn "data" process-received-data))
 
 (defn main []
@@ -75,10 +73,7 @@
     (set! *peer* (js/Peer. own-id (js-obj "key" "0uudvj3cp4fe0zfr")))
     (set! *connection* (.connect *peer* other-id))
     (.on *connection* "open" toggle-connected)
-
-    (.on *peer* "connection" accept-connection)
-
-    (log "d")))
+    (.on *peer* "connection" accept-connection)))
 
 (dom/listen! (sel1 :#start) :click main)
 
