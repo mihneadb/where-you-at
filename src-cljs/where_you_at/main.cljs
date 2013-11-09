@@ -3,7 +3,6 @@
     (:require [dommy.core :as dom]))
 
 (def *connected* false)
-<<<<<<< HEAD
 (def *peer* nil)
 (def *connection* nil)
 
@@ -14,6 +13,15 @@
 
 (defn log [stuff]
   (.log js/console stuff))
+
+(defn center-map [latLng]
+  (log *mapInstance*)
+  (.setCenter *mapInstance* latLng))
+
+(defn place-marker [latLng]
+  (google.maps.Marker. (js-obj "position" latLng
+                              "map" *mapInstance*
+                              "title" "Where you at")))
 
 (defn send-location-data [position]
     (let [coords (aget position "coords")
@@ -38,32 +46,24 @@
 (defn ^:export toggle-connected []
   (log "toggled")
 
-(defn place-marker [latLng]
-  (google.maps.Marker. (js-obj "position" latLng
-                              "map" *mapInstance*
-                              "title" "Where you at")))
 
 (defn process-recieved-data [data]
   (let [words (clojure.string/split data #" ")]))
 
 
 (defn toggle-connected []
->>>>>>> Add marker to current location
   (set! *connected* (not *connected*)))
 
-(defn center-map [latLng]
-  (log *mapInstance*)
-  (.setCenter *mapInstance* latLng))
 
 (defn map-config-obj []
   (js-obj "zoom" 12
-          "mapTypeId" window/google.maps.MapTypeId.ROADMAP
+          "mapTypeId" js/window.google.maps.MapTypeId.ROADMAP
           "center" (js/window.google.maps.LatLng. 25 25)))
 ;;
 (defn ^:export init []
   (.watchPosition js/navigator.geolocation send-location-data)
-  (window/google.maps.Map. (sel1 :#map) (map-config-obj)))
-  (set! *mapInstance* (window/google.maps.Map. (sel1 :#map) (map-config-obj))))
+  (js/window.google.maps.Map. (sel1 :#map) (map-config-obj)))
+  (set! *mapInstance* (js/window.google.maps.Map. (sel1 :#map) (map-config-obj))))
 
 (set! (.-onload js/window) init)
 
