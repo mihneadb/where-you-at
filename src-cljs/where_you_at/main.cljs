@@ -44,8 +44,7 @@
     (log (str "Received" latitude " " longitude))))
 
 (defn ^:export toggle-connected []
-  (log "toggled")
-
+  (log "toggled"))
 
 (defn process-recieved-data [data]
   (let [words (clojure.string/split data #" ")]))
@@ -62,7 +61,7 @@
 ;;
 (defn ^:export init []
   (.watchPosition js/navigator.geolocation send-location-data)
-  (js/window.google.maps.Map. (sel1 :#map) (map-config-obj)))
+  (js/window.google.maps.Map. (sel1 :#map) (map-config-obj))
   (set! *mapInstance* (js/window.google.maps.Map. (sel1 :#map) (map-config-obj))))
 
 (set! (.-onload js/window) init)
