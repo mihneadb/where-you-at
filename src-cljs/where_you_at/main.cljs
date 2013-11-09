@@ -18,14 +18,16 @@
         (log "sending")
         (.send *connection* (str latitude " " longitude)))))
 
-(defn process-recieved-data [data]
+(defn ^:export process-received-data [data]
+  (log "got data")
+  (log data)
   (let [words (clojure.string/split data #" ")
         latitude (read-string (data 0))
         longitude (read-string (data 1))]
     (log (str "Received" latitude " " longitude))))
 
 
-(defn toggle-connected []
+(defn ^:export toggle-connected []
   (log "toggled")
   (set! *connected* (not *connected*)))
 
@@ -42,7 +44,7 @@
 
 (set! (.-onload js/window) init)
 
-(defn accept-connection [conn]
+(defn ^:export accept-connection [conn]
   (.on conn "data" process-received-data))
 
 (defn main []
