@@ -13,4 +13,12 @@
 
 (.watchPosition js/navigator.geolocation process-location-data)
 
+(defn map-config-obj []
+  (js-obj "zoom" 12
+          "mapTypeId" window/google.maps.MapTypeId.ROADMAP
+          "center" (js/window.google.maps.LatLng. 25 25)))
+;;
+(defn ^:export init []
+  (window/google.maps.Map. (sel1 :#map) (map-config-obj)))
 
+(set! (.-onload js/window) init)
