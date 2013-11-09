@@ -42,16 +42,17 @@
 
 (set! (.-onload js/window) init)
 
+(defn accept-connection [conn]
+  (.on conn "data" process-received-data))
+
 (defn main []
   (let [own-id (dom/value (sel1 :#self))
         other-id (dom/value (sel1 :#other))]
-    (set! *peer* (js/Peer. (js-obj "key" "0uudvj3cp4fe0zfr"
-                                   "id" own-id)))
+    (set! *peer* (js/Peer. own-id (js-obj "key" "0uudvj3cp4fe0zfr")))
     (set! *connection* (.connect *peer* other-id))
     (.on *connection* "open" toggle-connected)
 
-    (.on *peer* "connection" (fn [conn]
-                               (.on conn "data" process-received-data)))
+    (.on *peer* "connection" accept-connection)
 
     (log "d")))
 
