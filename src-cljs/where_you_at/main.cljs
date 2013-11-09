@@ -18,7 +18,10 @@
         (.send *connection* (str latitude " " longitude)))))
 
 (defn process-recieved-data [data]
-  (let [words (clojure.string/split data #" ")]))
+  (let [words (clojure.string/split data #" ")
+        latitude (read-string (data 0))
+        longitude (read-string (data 1))]
+    (log (str "Received" latitude " " longitude))))
 
 (.watchPosition js/navigator.geolocation send-location-data)
 
